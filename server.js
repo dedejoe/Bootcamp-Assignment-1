@@ -1,17 +1,29 @@
 var http = require('http'), 
     fs = require('fs'), 
     url = require('url'),
-    port = 8080;
+    port = 8080
+    ;
 
 /* Global variables */
 var listingData, server;
 
 var requestHandler = function(request, response) {
-  var parsedUrl = url.parse(request.url);
+    var parsedUrl = url.parse(request.url);
+
+    if (parsedUrl.pathname == '/listings') {
+        response.write(listingData);
+        response.end();
+    }
+    else {
+        response.statusCode = 404;
+        response.write('Bad gateway error');
+        response.end();
+    }
+
 
   /*
     Your request handler should send listingData in the JSON format as a response if a GET request 
-    is sent to the '/listings' path. Otherwise, it should send a 404 error. 
+    is sent to the '/listings' path. Otherwise, it should send a 404 error.
 
     HINT: Explore the request object and its properties 
     HINT: Explore the response object and its properties
@@ -35,17 +47,25 @@ fs.readFile('listings.json', 'utf8', function(err, data) {
     //https://nodejs.org/api/fs.html#fs_fs_readfile_path_options_callback
 
     HINT: Read up on JSON parsing Node.js
-   */
+    */
 
     //Check for errors
+
+    if (err) throw err;
   
 
-   //Save the sate in the listingData variable already defined
+    //Save the sate in the listingData variable already defined
   
+    listingData = data;
 
-  //Creates the server
+    //Creates the server
   
-  //Start the server
+    var server = http.createServer(requestHandler);
 
+    //Start the server
+
+    server.listen(port, function () {
+        console.log('Server listening on: http://localhost:' + port);
+    });
 
 });
